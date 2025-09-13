@@ -424,7 +424,8 @@ def main():
 
     # Generate config
     peer_urls = [result["url"] for result in filtered_results]
-    config_line = f"  Peers: [{', '.join([f'\"{peer}\"' for peer in peer_urls])}]"
+    peer_list = [f'"{peer}"' for peer in peer_urls]
+    config_line = f"  Peers: [{', '.join(peer_list)}]"
 
     print(f"\n{'='*60}")
     print("YGGDRASIL CONFIG (add to /etc/yggdrasil.conf):")
