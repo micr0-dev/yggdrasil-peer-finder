@@ -367,6 +367,11 @@ def main():
     parser.add_argument(
         "--no-verbose", action="store_true", help="Reduce output verbosity"
     )
+    parser.add_argument(
+        "--region",
+        type=str,
+        help="Force specific region (e.g., 'united-states', 'germany')",
+    )
     args = parser.parse_args()
 
     verbose = not args.no_verbose
@@ -375,11 +380,22 @@ def main():
     # Fetch peers from website
     peers_by_country = tester.fetch_peers()
 
-    # Find best region
-    best_region = tester.find_best_region(peers_by_country)
-    if not best_region:
-        print("No suitable regions found.")
-        sys.exit(1)
+    # Find best region or use specified region
+    if args.region:
+        if args.region in peers_by_country:
+            best_region = args.region
+            if verbose:
+                print(f"\nUsing specified region: {best_region}")
+        else:
+            available_regions = list(peers_by_country.keys())
+            print(f"Error: Region '{args.region}' not found.")
+            print(f"Available regions: {', '.join(available_regions)}")
+            sys.exit(1)
+    else:
+        best_region = tester.find_best_region(peers_by_country)
+        if not best_region:
+            print("No suitable regions found.")
+            sys.exit(1)
 
     # Test all peers in best region
     region_results = tester.test_all_peers_in_region(
